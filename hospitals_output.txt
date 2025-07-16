@@ -1,0 +1,6 @@
+Hospital Name,Rating,Open 24x7,Parking
+"Manipal Hospital Varthur Road (formerly Columbia Asia Hospital)",4.0,true,true
+"Manipal Hospitals",4.0,true,true
+"Motherhood Hospital",4.5,true,true
+"Koshys Hospital",4.0,true,true
+"Navachethana Hospital",3.5,true,true
