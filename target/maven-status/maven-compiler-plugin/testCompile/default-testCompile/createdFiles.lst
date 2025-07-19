@@ -1,3 +1,4 @@
 runners\TestRunner.class
 stepdefinitions\HospitalSteps.class
+stepdefinitions\AccessibilitySteps.class
 stepdefinitions\Hooks.class

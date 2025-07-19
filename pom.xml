@@ -9,6 +9,13 @@
   <version>1.0</version>
 
   <dependencies>
+    <!-- Lombok for annotations and compatibility with modern JDKs -->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>1.18.32</version>
+      <scope>provided</scope>
+    </dependency>
     <!-- Selenium -->
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
@@ -32,8 +39,14 @@
     <dependency>
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
-      <version>7.9.0</version>
-      <scope>test</scope>
+      <version>7.8.0</version>
+    </dependency>
+
+    <!-- ExtentReports -->
+    <dependency>
+      <groupId>com.aventstack</groupId>
+      <artifactId>extentreports</artifactId>
+      <version>5.0.9</version>
     </dependency>
 
     <!-- WebDriverManager (optional if you don’t want to manually add ChromeDriver) -->

@@ -1,2 +1,10 @@
+pages\BasePage.class
+pages\CorporateWellnessPage.class
+utilities\ExtentListener.class
 utils\DriverFactory.class
+pages\HospitalSearchPage.class
+utilities\ExtentManager.class
 pages\HomePage.class
+pages\DiagnosticsPage.class
+pages\AccessibilityPage.class
+utilities\ScreenshotUtil.class
