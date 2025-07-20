@@ -52,7 +52,6 @@ public class HospitalSteps {
     @Then("I display them in the console")
     public void displayCities() {
         System.out.println("[Thread " + Thread.currentThread().getId() + "] - displayCities");
-        // No-op: already printed in extractTopDiagnosticCities
     }
 
     @Given("I navigate to the Corporate Wellness page")

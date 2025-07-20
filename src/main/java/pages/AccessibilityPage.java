@@ -11,13 +11,11 @@ public class AccessibilityPage extends BasePage {
         super(driver);
     }
 
-    // Check for common ARIA attributes for screen reader compatibility
     public boolean hasAriaAttributes() {
         List<WebElement> elements = driver.findElements(By.xpath("//*[@aria-label or @aria-labelledby or @role]"));
         return !elements.isEmpty();
     }
 
-    // Check if page is navigable using keyboard only (tabbable elements)
     public boolean hasTabbableElements() {
         List<WebElement> tabbable = driver.findElements(By.cssSelector("a, button, input, select, textarea, [tabindex]"));
         for (WebElement el : tabbable) {
@@ -28,7 +26,6 @@ public class AccessibilityPage extends BasePage {
         return false;
     }
 
-    // Example: Check if skip to main content link exists (common accessibility feature)
     public boolean hasSkipToContentLink() {
         List<WebElement> skipLinks = driver.findElements(By.cssSelector("a[href*='skip'], a[aria-label*='skip']"));
         return !skipLinks.isEmpty();

@@ -13,15 +13,12 @@ public abstract class BasePage {
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
     }
 
-    // Common navigation method
     public void goToUrl(String url) {
         driver.get(url);
     }
 
-    // Common method to get page title
     public String getPageTitle() {
         return driver.getTitle();
     }
 
-    // Add other common utilities as needed
 }

@@ -8,11 +8,11 @@ public class Hooks {
 
     @Before
     public void setUp() {
-        DriverFactory.getDriver(); // Initializes Chrome
+        DriverFactory.getDriver();
     }
 
     @After
     public void tearDown() {
-        DriverFactory.quitDriver(); // Quits Chrome
+        DriverFactory.quitDriver(); 
     }
 }

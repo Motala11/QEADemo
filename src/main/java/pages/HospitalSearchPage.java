@@ -12,7 +12,6 @@ public class HospitalSearchPage extends BasePage {
     }
 
     public void searchAndSelectHospital() {
-        // Always set city to Bangalore from dropdown, using JS click for reliability
         WebElement cityBox = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("input[data-qa-id='omni-searchbox-locality']")));
         int maxAttempts = 3;
         boolean citySelected = false;
@@ -21,7 +20,6 @@ public class HospitalSearchPage extends BasePage {
             cityBox.clear();
             cityBox.sendKeys("Bangalore");
             try {
-                // Try "Search in entire Bangalore" first
                 WebElement suggestion = wait.until(ExpectedConditions.visibilityOfElementLocated(
                     By.xpath("//div[@data-qa-id='omni-suggestion-entire-city' and contains(text(),'Search in entire Bangalore')]")
                 ));
@@ -31,7 +29,6 @@ public class HospitalSearchPage extends BasePage {
                 Thread.sleep(500);
             } catch (Exception e1) {
                 try {
-                    // Fallback: try any suggestion containing 'Bangalore'
                     WebElement suggestion2 = wait.until(ExpectedConditions.visibilityOfElementLocated(
                         By.xpath("//div[contains(@data-qa-id,'omni-suggestion') and contains(text(),'Bangalore')]")
                     ));
@@ -50,17 +47,13 @@ public class HospitalSearchPage extends BasePage {
             }
         }
 
-        // Always set search to "Hospital" from dropdown (regardless of query)
         WebElement searchBox = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("input[data-qa-id='omni-searchbox-keyword']")));
-        // Only type 'Hospital' once, then process suggestions
         searchBox.clear();
-        // Type 'Hosp' one character at a time with a delay to trigger correct suggestions
         String hosp = "Hosp";
         for (char c : hosp.toCharArray()) {
             searchBox.sendKeys(Character.toString(c));
             try { Thread.sleep(150); } catch (InterruptedException ignored) {}
         }
-        // Optionally, wait a bit for suggestions to update
         try { Thread.sleep(300); } catch (InterruptedException ignored) {}
         try {
             List<WebElement> suggestions = wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("div[data-qa-id='omni-suggestion-listing']")));
@@ -101,34 +94,28 @@ public class HospitalSearchPage extends BasePage {
             System.out.println("[DEBUG] Could not find or click suggestion: " + e.getMessage());
             searchBox.sendKeys(Keys.ENTER);
         }
-        // Re-locate the search box after clicking to avoid stale element
         try {
             searchBox = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("input[data-qa-id='omni-searchbox-keyword']")));
             System.out.println("[DEBUG] Final search box value: " + searchBox.getAttribute("value"));
         } catch (Exception e) {
             System.out.println("[DEBUG] Could not re-locate search box after click: " + e.getMessage());
         }
-        // Wait for the results page to load
         wait.until(webDriver -> ((JavascriptExecutor) webDriver)
             .executeScript("return document.readyState").equals("complete"));
     }
 
     public void apply24x7AndParkingFilters() {
-        // Robust selectors for 24x7 and Parking filters
         boolean found24x7 = false, foundParking = false;
         try {
-            // Practo uses input[type=checkbox] + label for filters, so find by label[for] or aria-label
             List<WebElement> allLabels = driver.findElements(By.cssSelector("label, [aria-label]"));
             for (WebElement label : allLabels) {
                 String text = label.getText().trim().toLowerCase();
                 if (!found24x7 && (text.contains("24x7") || text.contains("24/7") || text.contains("open 24"))) {
-                    // Try clicking the label or its associated input
                     try {
                         label.click();
                         found24x7 = true;
                         Thread.sleep(500);
                     } catch (Exception e) {
-                        // Try clicking the input if label fails
                         try {
                             String forAttr = label.getAttribute("for");
                             if (forAttr != null) {
@@ -167,7 +154,6 @@ public class HospitalSearchPage extends BasePage {
     }
 
     public void extractTopHospitals() {
-        // Extract first 5 hospitals with rating >= 3.5, "Open 24x7", and Parking in amenities
         int found = 0;
         int page = 1;
         java.io.File outFile = new java.io.File("hospitals_output.txt");
@@ -183,16 +169,13 @@ public class HospitalSearchPage extends BasePage {
                         String name = "";
                         double rating = 0.0;
                         boolean open247 = false;
-                        // Name
                         try {
                             name = hospital.findElement(By.cssSelector(".c-estb-info h2.line-1")).getText();
                         } catch (Exception ignore) {}
-                        // Rating
                         try {
                             String ratingStr = hospital.findElement(By.cssSelector(".col-3 .c-feedback .text-1 > span.u-bold")).getText().trim();
                             rating = Double.parseDouble(ratingStr);
                         } catch (Exception ignore) {}
-                        // Open 24x7
                         try {
                             String openText = hospital.findElement(By.cssSelector(".line-4 .pd-right-2px-text-green")).getText();
                             if (openText != null && openText.toLowerCase().contains("24x7")) {
@@ -201,14 +184,11 @@ public class HospitalSearchPage extends BasePage {
                         } catch (Exception ignore) {}
                         if (open247 && rating >= 3.5) {
                             anyProcessed = true;
-                            // Click to open hospital details in a new tab/window
                             try {
                                 ((JavascriptExecutor) driver).executeScript("window.open(arguments[0].querySelector('a').href, '_blank');", hospital);
                             } catch (Exception e) {
-                                // fallback: try clicking the card
                                 try { hospital.click(); } catch (Exception ignore2) {}
                             }
-                            // Switch to new tab
                             String originalWindow = driver.getWindowHandle();
                             for (String handle : driver.getWindowHandles()) {
                                 if (!handle.equals(originalWindow)) {
@@ -216,10 +196,8 @@ public class HospitalSearchPage extends BasePage {
                                     break;
                                 }
                             }
-                            // Handle cookies/consent popup if present (try multiple selectors)
                             try {
                                 WebDriverWait popupWait = new WebDriverWait(driver, Duration.ofSeconds(5));
-                                // Try the provided absolute XPath for consent
                                 try {
                                     WebElement consentBtn = popupWait.until(ExpectedConditions.elementToBeClickable(
                                         By.xpath("/html/body/div[6]/div[2]/div[2]/div[3]/div[2]/button[1]")));
@@ -227,7 +205,6 @@ public class HospitalSearchPage extends BasePage {
                                     Thread.sleep(300);
                                     System.out.println("[INFO] Closed consent/cookie popup with absolute XPath.");
                                 } catch (Exception eAbs) {
-                                    // Fallback to previous logic if absolute XPath fails
                                     By[] consentSelectors = new By[] {
                                         By.xpath("//button[contains(text(),'Accept')]"),
                                         By.xpath("//button[contains(text(),'Got it')]"),
@@ -268,9 +245,7 @@ public class HospitalSearchPage extends BasePage {
                                     }
                                 }
                             } catch (Exception e) {
-                                // Popup not present, continue
                             }
-                            // Wait for "Read more info" and click using robust selector
                             try {
                                 WebDriverWait localWait = new WebDriverWait(driver, Duration.ofSeconds(10));
                                 WebElement readMore = localWait.until(ExpectedConditions.elementToBeClickable(
@@ -282,7 +257,6 @@ public class HospitalSearchPage extends BasePage {
                             } catch (Exception e) {
                                 System.out.println("[WARN] Could not click 'Read more info': " + e.getMessage());
                             }
-                            // Check amenities for Parking
                             boolean hasParking = false;
                             try {
                                 List<WebElement> amenities = driver.findElements(By.cssSelector("div[data-qa-id='amenities_list'] span[data-qa-id='amenity_item']"));
@@ -295,7 +269,6 @@ public class HospitalSearchPage extends BasePage {
                             } catch (Exception e) {
                                 System.out.println("[WARN] Could not extract amenities: " + e.getMessage());
                             }
-                            // Close the tab and switch back
                             driver.close();
                             driver.switchTo().window(originalWindow);
                             if (hasParking) {
@@ -307,23 +280,19 @@ public class HospitalSearchPage extends BasePage {
                     } catch (StaleElementReferenceException se) {
                         i--;
                     } catch (Exception e) {
-                        // skip if any info not found
                     }
                 }
-                // If not enough found and there is a next page, go to next page
                 if (found < 5) {
-                    // Try to click next page button if present
                     try {
                         WebElement nextBtn = driver.findElement(By.cssSelector("a[aria-label='Next']"));
                         if (nextBtn.isDisplayed() && nextBtn.isEnabled()) {
                             ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", nextBtn);
                             nextBtn.click();
-                            Thread.sleep(2000); // Wait for next page to load
+                            Thread.sleep(2000);
                             page++;
                             continue;
                         }
                     } catch (Exception e) {
-                        // No next button, break
                         break;
                     }
                 } else {
